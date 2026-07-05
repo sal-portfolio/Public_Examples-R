@@ -52,6 +52,11 @@ df_long <- df %>%
     names_to = c("Category", ".value"),
     names_sep = "_"
   )
+#
+#check to see how correlated tangibility no control and meanstoend are, lining up responseID and category type
+#or, for every category (random effect), estimate a model of tangibility based on control pairing within person...then average across categories
+
+
 #run an ordinal logistic regression of PoP on potential mechanisms
 #incl random effects at the individual level 
 model_data <- df_long %>%
@@ -61,7 +66,3 @@ model <- clmm(PoP ~ tangibility + nocontrol + meanstoend + (1 | ResponseId),
               data = model_data)
 summary(model)
 
-library(GGally)
-model_data %>%
-  select(tangibility, nocontrol, meanstoend) %>%
-  ggpairs()
