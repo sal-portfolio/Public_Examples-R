@@ -1,0 +1,12 @@
+{
+  "name": "R Dev Container",
+  "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "RDebugger.r-debugger"
+      ]
+    }
+  }
+}
