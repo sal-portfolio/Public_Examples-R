@@ -5,7 +5,50 @@
 library(tidyverse)
 
 # Load data
-# df <- read_csv("data/yourfile.csv")
+df <- read_csv("painofpayment/data/PoPv2_6.21.2026_July+3,+2026_14.48.csv")
 
 # Explore
-# glimpse(df)
+glimpse(df)
+
+#remove the string/description data in 2nd & 3rd rows
+df <- df %>%
+  slice(-c(2, 3))
+
+# Pass attention check? (var)
+df <- df %>%
+  mutate(attentive = ifelse(Attention_1 == 1 & Attention_3 == 2 & 
+  Attention_4 == 2 & Attention_5 == 1, 1, 0))
+
+#rename pain of payment vars
+df <- df %>%
+  rename(HotelWifiQuestion_PoP = PoPGeneralQuestion_1, InflightWifiQuestion_PoP = PoPGeneralQuestion_2,
+  ParkingQuestion_PoP = PoPGeneralQuestion_3, HotelBFQuestion_PoP = PoPGeneralQuestion_4,
+  AppetizerQuestion_PoP = PoPGeneralQuestion_5, PrinterInkQuestion_PoP = PoPGeneralQuestion_6,
+  CargasQuestion_PoP = PoPGeneralQuestion_7, Fragrance_PoP = PoPGeneralQuestion_8)
+
+#Based on prelim analysis (high inter-item corr), create composite scores
+all_names <- c()
+for (prefix in c("HotelWifiQuestion", "InflightWifiQuestion", "ParkingQuestion",
+"HotelBFQuestion", "AppetizerQuestion", "PrinterInkQuestion", "CargasQuestion", "Fragrance")) {
+  concrete <- paste0(prefix, "_1")
+  touch <- paste0(prefix, "_2")
+  unavoidable <- paste0(prefix, "_3")
+  norealchoice <- paste0(prefix, "_4")
+  notvalued <- paste0(prefix, "_5")
+  notenjoyed <- paste0(prefix, "_6")
+  
+  df[[paste0(prefix, "_tangibility")]] <- rowMeans(df[, c(concrete, touch)], na.rm = TRUE)
+  df[[paste0(prefix, "_control")]] <- rowMeans(df[, c(unavoidable, norealchoice)], na.rm = TRUE)
+  df[[paste0(prefix, "_meanstoend")]] <- rowMeans(df[, c(notvalued, notenjoyed)], na.rm = TRUE)
+  
+  all_names <- c(all_names, paste0(prefix, "_tangibility"), 
+  paste0(prefix, "_control"), paste0(prefix, "_meanstoend"),
+  paste0(prefix, "_PoP"))
+}
+# turn data into long format
+df_long <- df %>%
+  pivot_longer(
+    cols = all_names,
+    names_to = c("Category", ".value"),
+    names_sep = "_"
+  ) 
