@@ -197,3 +197,38 @@ corr_summary <- corr_summary %>%
 
 corr_summary %>% as.data.frame()
 write_csv(corr_summary, "corr_summary.csv")
+
+#running reg 
+library(MASS)
+
+model_data <- person_level_long %>%
+  mutate(painful_1 = as.ordered(painful_1))
+
+ordinal_model <- polr(painful_1 ~ f_convenience + f_choice + f_expectfree + f_overpriced + f_budget_strain + f_complementary,
+                       data = model_data, Hess = TRUE)
+
+summary(ordinal_model)
+
+coef_table <- coef(summary(ordinal_model))
+p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
+coef_table <- cbind(coef_table, p_value = p_values)
+
+ordinal_stats <- as.data.frame(coef_table)
+ordinal_stats$term <- rownames(ordinal_stats)
+
+ordinal_stats <- ordinal_stats %>%
+  dplyr::select(term, Value, `Std. Error`, p_value) %>%
+  mutate(
+    Value = round(Value, 3),
+    `Std. Error` = round(`Std. Error`, 3),
+    p_value = case_when(
+      p_value < .001 ~ "p<.001",
+      TRUE ~ paste0("p=", round(p_value, 3))
+    )
+  )
+
+ordinal_stats
+
+dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
+
+write_csv(ordinal_stats, "painofpayment/output/ordinal_model_stats.csv")
