@@ -227,8 +227,9 @@ ordinal_stats <- ordinal_stats %>%
     )
   )
 
-ordinal_stats
+ordinal_stats_predictors_only <- ordinal_stats %>%
+  filter(term %in% c("f_convenience", "f_choice", "f_expectfree", "f_overpriced", "f_budget_strain", "f_complementary"))
 
 dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
 
-write_csv(ordinal_stats, "painofpayment/output/ordinal_model_stats.csv")
+write_csv(ordinal_stats_predictors_only, "painofpayment/output/ordinal_model_stats.csv")
