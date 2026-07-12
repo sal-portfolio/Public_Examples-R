@@ -5,9 +5,7 @@ library(tidyverse)
 raw_names <- read_csv("painofpayment/data/PoP+Factor+Analysis+10-16-25_July+9,+2026_17.33.csv", n_max = 0, name_repair = "minimal") %>% names()
 
 #  Load the data & take out two junk rows/descriptions
-df <- read_csv("painofpayment/data/PoP+Factor+Analysis+10-16-25_July+9,+2026_17.33.csv") %>%
-  dplyr::slice(-c(1, 2)) %>%
-  type_convert()
+df <- read_csv("painofpayment/data/PoP+Factor+Analysis+10-16-25_July+9,+2026_17.33.csv", name_repair = "minimal") 
 
 # Find the position of each occurrence of prod_1_x across the 3 blocks
 prod_items <- c(1:9, 11:46)
@@ -21,6 +19,11 @@ block3_idx <- purrr::map_int(positions, 3)  # 3rd occurrence of each item
 # Rename block 2 and block 3 by position (block 1 stays as prod_1_x)
 names(df)[block2_idx] <- paste0("prod_2_", prod_items)
 names(df)[block3_idx] <- paste0("prod_3_", prod_items)
+
+# take away two description rows and convert type
+df <- df %>%
+  dplyr::slice(-c(1, 2)) %>%
+  type_convert()
 
 # Rename the standalone Q-numbered columns
 df <- df %>%
@@ -49,6 +52,23 @@ df_final <- df %>%
   filter(attention_check == 1) %>%
   select(ResponseId, age, gender, attention_check,
          starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3"),
-         starts_with("shark"), starts_with("Item"))
+        starts_with("Item"))
 
 glimpse(df_final)
+
+# Pivot into long format
+# Prefix (prod_1/prod_2/prod_3) becomes "Category"
+# Suffix (1-46, painful_1, typ_charge, fair_price, like_1, value_1, purchased) becomes its own column
+
+pivot_cols <- df_final %>%
+  select(starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3")) %>%
+  names()
+
+df_long <- df_final %>%
+  pivot_longer(
+    cols = all_of(pivot_cols),
+    names_to = c("Category", ".value"),
+    names_pattern = "^(prod_[123])_(.*)$"
+  )
+
+glimpse(df_long)
