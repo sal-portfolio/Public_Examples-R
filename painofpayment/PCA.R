@@ -39,9 +39,15 @@ df <- df %>%
     prod_3_purchased = Q603
   )
 
-# Keep only the relevant columns
+# Create attention_check variable
+df <- df %>%
+  mutate(attention_check = ifelse(shark_screeners_1 == 1 & shark_screeners_3 == 0 & shark_screeners_4 == 0, 1, 0),
+         attention_check = ifelse(is.na(attention_check), 0, attention_check))
+
+#  Keep only relevant columns, filtered to attention_check == 1
 df_final <- df %>%
-  select(ResponseId, age, gender,
+  filter(attention_check == 1) %>%
+  select(ResponseId, age, gender, attention_check,
          starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3"),
          starts_with("shark"), starts_with("Item"))
 
