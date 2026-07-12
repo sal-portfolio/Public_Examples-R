@@ -1,3 +1,4 @@
+library(MASS)
 library(tidyverse)
 library(psych)
 
@@ -52,7 +53,7 @@ df <- df %>%
 #  Keep only relevant columns, filtered to attention_check == 1
 df_final <- df %>%
   filter(attention_check == 1) %>%
-  select(ResponseId, age, gender, attention_check,
+  dplyr::select(ResponseId, age, gender, attention_check,
          starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3"),
         starts_with("Item"))
 
@@ -63,7 +64,7 @@ glimpse(df_final)
 # Suffix (1-46, painful_1, typ_charge, fair_price, like_1, value_1, purchased) becomes its own column
 
 pivot_cols <- df_final %>%
-  select(starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3")) %>%
+  dplyr::select(starts_with("prod_1"), starts_with("prod_2"), starts_with("prod_3")) %>%
   names()
 
 df_long <- df_final %>%
@@ -127,7 +128,7 @@ df_long <- df_long %>%
 
 #for factor analysis, average scores within person across products
 person_level_long <- df_long %>%
-  select(-Item, -Item2, -Item3, -Category) %>%
+  dplyr::select(-Item, -Item2, -Item3, -Category) %>%
   group_by(ResponseId) %>%
   summarize(
     across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
@@ -140,7 +141,7 @@ glimpse(person_level_long)
 # run factor analysis on person_level data
 
 items <- person_level_long %>%
-  select(too_high:makes_life_more_convenient)  
+  dplyr::select(too_high:makes_life_more_convenient)  
 KMO(items)
 cortest.bartlett(items)
 fa.parallel(items, fa = "fa")
@@ -199,13 +200,17 @@ corr_summary %>% as.data.frame()
 write_csv(corr_summary, "corr_summary.csv")
 
 #running reg 
-library(MASS)
-
 model_data <- person_level_long %>%
   mutate(painful_1 = as.ordered(painful_1))
 
-ordinal_model <- polr(painful_1 ~ f_convenience + f_choice + f_expectfree + f_overpriced + f_budget_strain + f_complementary,
-                       data = model_data, Hess = TRUE)
+# Dynamically grab every column starting with "f_"
+f_vars <- grep("^f_", names(model_data), value = TRUE)
+
+# Build the formula using all f_ predictors
+formula_str <- paste("painful_1 ~", paste(f_vars, collapse = " + "))
+ordinal_formula <- as.formula(formula_str)
+
+ordinal_model <- polr(ordinal_formula, data = model_data, Hess = TRUE)
 
 summary(ordinal_model)
 
@@ -227,8 +232,9 @@ ordinal_stats <- ordinal_stats %>%
     )
   )
 
+# Filter to just the predictor rows, using the same dynamic f_vars list
 ordinal_stats_predictors_only <- ordinal_stats %>%
-  filter(term %in% c("f_convenience", "f_choice", "f_expectfree", "f_overpriced", "f_budget_strain", "f_complementary"))
+  filter(term %in% f_vars)
 
 dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
 

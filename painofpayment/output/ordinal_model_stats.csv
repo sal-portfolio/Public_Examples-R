@@ -1,7 +1,9 @@
 term,Value,Std. Error,p_value
-f_convenience,-0.495,0.16,p=0.002
-f_choice,-0.552,0.151,p<.001
-f_expectfree,-0.098,0.159,p=0.539
-f_overpriced,1.064,0.179,p<.001
-f_budget_strain,0.897,0.169,p<.001
-f_complementary,0.143,0.153,p=0.351
+f_choice,-0.498,0.162,p=0.002
+f_longlasting,-0.509,0.154,p<.001
+f_expectfree,-0.134,0.161,p=0.408
+f_overpriced,1.087,0.183,p<.001
+f_budget_strain,-0.212,0.141,p=0.131
+f_convenience,0.044,0.14,p=0.75
+f_complementary,0.915,0.172,p<.001
+f_tangible,0.183,0.156,p=0.24
