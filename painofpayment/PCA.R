@@ -150,6 +150,50 @@ fa_result$communality
 
 ####look at this later
 factor_scores <- as.data.frame(fa_result$scores)
-names(factor_scores) <- paste0("factor_", 1:8)  # or rename to your actual construct names, e.g., "tangibility_factor"
 
-person_level_long <- bind_cols(person_level_long, factor_scores)
+person_level_long <- person_level_long %>%
+  bind_cols(factor_scores) %>%
+  rename(
+    f_convenience = ML1,
+    f_choice = ML8,
+    f_expectfree = ML2,
+    f_overpriced = ML4,
+    f_tangible = ML6,
+    f_longlasting = ML3,
+    f_budget_strain = ML7,
+    f_complementary = ML5
+  )
+#these should be RM corrs***
+vars <- c("painful_1", grep("^f_", names(person_level_long), value = TRUE))
+pairs <- combn(vars, 2, simplify = FALSE)
+
+corr_results <- list()
+
+for (pair in pairs) {
+  var1 <- pair[1]
+  var2 <- pair[2]
+  pair_name <- paste0(var1, "_", var2)
+  
+  result <- cor.test(person_level_long[[var1]], person_level_long[[var2]])
+  
+  corr_results[[pair_name]] <- result
+}
+
+#save as csv a table showing corr results
+corr_summary <- map_dfr(corr_results, ~ tibble(
+  r = .x$estimate,
+  df = .x$parameter,
+  p_value = .x$p.value
+), .id = "pair")
+
+corr_summary <- corr_summary %>%
+  mutate(
+    p_value = case_when(
+      p_value < .001 ~ "p<.001",
+      TRUE ~ paste0("p=", round(p_value, 3))
+    ),
+    r = round(r, 3)
+  )
+
+corr_summary %>% as.data.frame()
+write_csv(corr_summary, "corr_summary.csv")
