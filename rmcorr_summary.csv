@@ -1,0 +1,7 @@
+pair,r,df,p_value
+tangibility_control,0.092,706,p=0.014
+tangibility_meanstoend,-0.331,706,p<.001
+tangibility_PoP,-0.302,706,p<.001
+control_meanstoend,-0.768,706,p<.001
+control_PoP,-0.154,706,p<.001
+meanstoend_PoP,0.206,706,p<.001
