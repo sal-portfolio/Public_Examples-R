@@ -1,4 +1,6 @@
 library(tidyverse)
+library(psych)
+
 
 # Read raw header without deduplication, to preserve true positions
 # of repeated column names (prod_1_1 through prod_1_46 appear 3 times)
@@ -72,3 +74,82 @@ df_long <- df_final %>%
   )
 
 glimpse(df_long)
+
+# renaming variables 
+df_long <- df_long %>%
+  rename(
+    too_high = `1`,
+    overpriced = `2`,
+    ripoff = `3`,
+    expensive = `4`,
+    worth_price = `5`,
+    cheaper_not_different = `6`,
+    budget_strain = `7`,
+    needs_wealth = `8`,
+    extra_money_to_spare = `9`,
+    helps_other_things = `11`,
+    worthless_alone = `12`,
+    value_with_others = `13`,
+    wouldnt_buy_if_not_required = `14`,
+    should_come_included = `15`,
+    unnecessary = `16`,
+    have_choice = `17`,
+    have_other_options = `18`,
+    no_real_alternatives = `19`,
+    negative_consequences_if_not = `20`,
+    feel_powerless = `21`,
+    cant_control_timing = `22`,
+    purchase_regularly = `23`,
+    buy_similar_soon = `24`,
+    always_pretty_much_same = `25`,
+    recurring_bill = `26`,
+    very_aware_when_charged = `27`,
+    always_have_to_pay = `28`,
+    can_hold_touch = `29`,
+    physical_product = `30`,
+    can_physically_keep = `31`,
+    use_long_period = `32`,
+    lasts_a_while = `33`,
+    feels_like_investment = `34`,
+    businesses_give_away_free = `35`,
+    people_dont_pay_money = `36`,
+    expect_free = `37`,
+    should_be_free = `38`,
+    roughly_the_same_anywhere = `39`,
+    many_different_types = `40`,
+    unsure_long_term_benefit = `41`,
+    unsure_before_using = `42`,
+    learn_quality_after_purchase = `43`,
+    saves_time = `44`,
+    makes_life_easier = `45`,
+    makes_life_more_convenient = `46`
+  )
+
+#for factor analysis, average scores within person across products
+person_level_long <- df_long %>%
+  select(-Item, -Item2, -Item3, -Category) %>%
+  group_by(ResponseId) %>%
+  summarize(
+    across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
+    across(where(is.character), ~ first(.x)),
+    .groups = "drop"
+  )
+
+glimpse(person_level_long)
+
+# run factor analysis on person_level data
+
+items <- person_level_long %>%
+  select(too_high:makes_life_more_convenient)  
+KMO(items)
+cortest.bartlett(items)
+fa.parallel(items, fa = "fa")
+fa_result <- fa(items, nfactors = 8, rotate = "oblimin", fm = "ml")
+print(fa_result, cut = 0.55, sort = TRUE)
+fa_result$communality
+
+####look at this later
+factor_scores <- as.data.frame(fa_result$scores)
+names(factor_scores) <- paste0("factor_", 1:8)  # or rename to your actual construct names, e.g., "tangibility_factor"
+
+person_level_long <- bind_cols(person_level_long, factor_scores)
