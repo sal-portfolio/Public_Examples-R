@@ -200,7 +200,7 @@ corr_summary <- corr_summary %>%
   )
 
 corr_summary %>% as.data.frame()
-write_csv(corr_summary, "output/Study6corr_summary.csv")
+write_csv(corr_summary, "painofpayment/output/Study6corr_summary.csv")
 
 #running reg 
 model_data <- person_level_long %>%
