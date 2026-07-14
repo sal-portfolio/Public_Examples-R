@@ -152,7 +152,7 @@ fa_result <- fa(items, nfactors = 8, rotate = "oblimin", fm = "ml")
 print(fa_result, cut = 0.55, sort = TRUE)
 fa_result$communality
 
-####look at this later
+####saving full-load factors at the individual-level (*pooled across products)
 factor_scores <- as.data.frame(fa_result$scores)
 
 person_level_long <- person_level_long %>%
@@ -167,7 +167,7 @@ person_level_long <- person_level_long %>%
     f_budget_strain = ML7,
     f_complementary = ML5
   )
-#these should be RM corrs***
+#checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
 vars <- c("painful_1", grep("^f_", names(person_level_long), value = TRUE))
 pairs <- combn(vars, 2, simplify = FALSE)
 
@@ -202,7 +202,7 @@ corr_summary <- corr_summary %>%
 corr_summary %>% as.data.frame()
 write_csv(corr_summary, "painofpayment/output/Study6corr_summary.csv")
 
-#running reg 
+#running reg (ordinal logistic)
 model_data <- person_level_long %>%
   mutate(painful_1 = as.ordered(painful_1))
 
@@ -235,7 +235,7 @@ ordinal_stats <- ordinal_stats %>%
     )
   )
 
-# Filter to just the predictor rows, using the same dynamic f_vars list
+# Create table output; filter to just the predictor rows, using the same dynamic f_vars list
 ordinal_stats_predictors_only <- ordinal_stats %>%
   filter(term %in% f_vars)
 
