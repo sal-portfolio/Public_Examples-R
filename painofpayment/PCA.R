@@ -1,3 +1,6 @@
+# Pain of Payment Study 6
+# Author: Amanda
+
 library(MASS)
 library(tidyverse)
 library(psych)
@@ -197,7 +200,7 @@ corr_summary <- corr_summary %>%
   )
 
 corr_summary %>% as.data.frame()
-write_csv(corr_summary, "corr_summary.csv")
+write_csv(corr_summary, "output/Study6corr_summary.csv")
 
 #running reg 
 model_data <- person_level_long %>%
@@ -238,4 +241,4 @@ ordinal_stats_predictors_only <- ordinal_stats %>%
 
 dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
 
-write_csv(ordinal_stats_predictors_only, "painofpayment/output/ordinal_model_stats.csv")
+write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6ordinal_model_stats.csv")

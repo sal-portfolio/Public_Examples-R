@@ -1,6 +1,5 @@
 # Pain of Payment Study 5
 # Author: Amanda
-# Date: 2026-07-04
 
 library(tidyverse)
 library(ordinal)
@@ -93,7 +92,7 @@ rmcorr_summary <- rmcorr_summary %>%
   r = round(r,3))
 
 rmcorr_summary %>% as.data.frame()
-write_csv(rmcorr_summary, "rmcorr_summary.csv")
+write_csv(rmcorr_summary, "output/Study5rmcorr_summary.csv")
 
 #run an ordinal logistic regression of PoP on potential mechanisms
 #incl random effects at the individual level 
@@ -119,5 +118,5 @@ predictor_stats <- coef_table %>%
     )
   )
 
-write_csv(predictor_stats, "reg_stats.csv")
+write_csv(predictor_stats, "output/Study5reg_stats.csv")
 
