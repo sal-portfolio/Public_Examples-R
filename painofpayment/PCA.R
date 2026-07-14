@@ -239,6 +239,6 @@ ordinal_stats <- ordinal_stats %>%
 ordinal_stats_predictors_only <- ordinal_stats %>%
   filter(term %in% f_vars)
 
-dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
+# dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
 
 write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6ordinal_model_stats.csv")
