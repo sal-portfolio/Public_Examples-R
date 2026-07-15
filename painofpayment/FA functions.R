@@ -1,7 +1,7 @@
 ##This file creates functions for running factor analysis, inter-factor corrs, and regressions
 ##can be used for individual-level (j) or individual-product level (ij) data, filtered by KMO results
 
-  KMO_results = function(items, KMO_threshold) {
+  KMO_results <- function(items, KMO_threshold) {
   kmo_result <- KMO(items)
   low_kmo_items <- names(kmo_result$MSAi[kmo_result$MSAi < KMO_threshold])
   }
@@ -10,9 +10,26 @@
   #cortest.bartlett(items)
   pa_result <- fa.parallel(items, fa = "fa")
   fa_result <- fa(items, nfactors = pa_result$nfact, rotate = "oblimin", fm = "ml")
-  }
+  #rename factors according to top item loadings
+  loadings_mat <- unclass(fa_result$loadings)
+  top_items <- apply(loadings_mat, 2, function(col) {
+    rownames(loadings_mat)[which.max(abs(col))]
+  })
+  top_items <- make.unique(top_items, sep = "_")
   
-  corr_results = function(vars, factor_data, prod_pooled, id) {
+  colnames(fa_result$loadings) <- top_items
+  colnames(fa_result$scores) <- top_items
+  
+  list(
+    model = fa_result,
+    scores = as.data.frame(fa_result$scores)
+  )
+}
+
+
+
+  
+  corr_results <- function(vars, factor_data, prod_pooled, id) {
   pairs <- combn(vars, 2, simplify = FALSE)
   corr_results <- list()
   for (pair in pairs) {
@@ -47,23 +64,31 @@
   corr_summary %>% as.data.frame()  
   }
   
-  reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
+
+reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
   factor_data[[y]] <- as.ordered(factor_data[[y]])
   if (prod_pooled) {
     ordinal_formula <- as.formula(paste(y, "~", paste(x_vars, collapse = " + ")))
     ordinal_model <- polr(ordinal_formula, data = factor_data, Hess = TRUE)
-  } 
-  else {
-  ordinal_formula <- as.formula(paste(y, "~", paste(x_vars, collapse = " + "), "+ (1 |", id, ")"))
-  ordinal_model <- clmm(ordinal_formula, data = factor_data)
+    
+    coef_table <- coef(summary(ordinal_model))
+    p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
+    coef_table <- cbind(coef_table, p_value = p_values)
+    
+  } else {
+    ordinal_formula <- as.formula(paste(y, "~", paste(x_vars, collapse = " + "), "+ (1 |", id, ")"))
+    ordinal_model <- clmm(ordinal_formula, data = factor_data)
+    
+    coef_table <- coef(summary(ordinal_model))
+    coef_table <- cbind(coef_table, p_value = coef_table[, "Pr(>|z|)"])
   }
-#output and format main results
-  coef_table <- coef(summary(ordinal_model))
-  p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
-  coef_table <- cbind(coef_table, p_value = p_values)
 
   ordinal_stats <- as.data.frame(coef_table)
   ordinal_stats$term <- rownames(ordinal_stats)
+  
+  if ("Estimate" %in% names(ordinal_stats)) {
+    ordinal_stats <- ordinal_stats %>% rename(Value = Estimate)
+  }
 
   ordinal_stats <- ordinal_stats %>%
     dplyr::select(term, Value, `Std. Error`, p_value) %>%
@@ -76,6 +101,8 @@
       )
     )
   # Create table output; filter to just the predictor rows, using the same dynamic f_vars list
-  stats_predictors_only <- ordinal_stats %>%
+
+  ordinal_stats %>%
     filter(term %in% x_vars)
-    }
+}
+

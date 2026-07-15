@@ -159,54 +159,52 @@ low_kmo_ij <- KMO_results(items_ij, 0.7)
 items_j_highkmo <- items_j[, !(names(items_j) %in% low_kmo_j)]
 items_ij_highkmo <- items_ij[, !(names(items_ij) %in% low_kmo_ij)]
 
+
 fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
 fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
 fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
 fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
 
+#print(factor_analysis(items_j)$model, cut = 0.5)  
+
+person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
+df_long_kmo <- cbind(df_long, fa_ij_highkmo)
+person_level_long_all <- cbind(person_level_long, fa_j_all)
+df_long_all <- cbind(df_long, fa_ij_all)
 
 
-
-************** edit all code below
-#######check this######
-fa_j_highkmo$communality
-fa_j_all$communality
-person_level_long <- person_level_long %>%
-  bind_cols(factor_scores) %>%
-  rename(
-    f_convenience = ML1,
-    f_choice = ML8,
-    f_expectfree = ML2,
-    f_overpriced = ML4,
-    f_tangible = ML6,
-    f_longlasting = ML3,
-    f_budget_strain = ML7,
-    f_complementary = ML5
-  )
 #checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
 
-vars_j_highkmo <- grep("^hf_", names(person_level_long), value = TRUE)
-vars_j_all <- grep("^f_", names(person_level_long), value = TRUE)
-vars_ij_highkmo <- grep("^hf_", names(df_long), value = TRUE)
-vars_ij_all <- grep("^f_", names(df_long), value = TRUE)
+corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
+corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
+corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
+corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
-corr_j_highkmo <- corr_results(vars_j_highkmo, person_level_long, TRUE, ResponseId)
-corr_j_all <- corr_results(vars_j_all, person_level_long, TRUE, ResponseId)
-corr_ij_highkmo <- corr_results(vars_ij_highkmo, df_long, FALSE, ResponseId)
-corr_ij_all <- corr_results(vars_ij_all, df_long, FALSE, ResponseId)
-
-write_csv(corr_summary, "painofpayment/output/Study6_j_corrs.csv")
 
 ################################################################################
 #Running regressions
 ################################################################################
 
-reg_pooled_all <- reg_results(person_level_long,painful_1, vars_j_all, TRUE, ResponseId)
-reg_pooled_kmo <- reg_results(person_level_long,painful_1, vars_j_highkmo, TRUE, ResponseId)
-reg_RE_all <- reg_results(df_long,painful_1, vars_ij_all, FALSE, ResponseId)
-reg_RE_kmo <- reg_results(df_long,painful_1, vars_ij_highkmo, FALSE, ResponseId)
+reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all), TRUE, "ResponseId")
+reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
+reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
+reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 
+#######writing outputs
+corr_all_combined <- bind_rows(
+  corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
+  corr_j_all       %>% mutate(analysis = "person_level_all"),
+  corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
+  corr_ij_all      %>% mutate(analysis = "person_product_all")
+)
 
-write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6_j_model.csv")
+write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", row.names = FALSE)
 
+reg_all_combined <- bind_rows(
+  reg_pooled_all %>% mutate(analysis = "pooled_all"),
+  reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
+  reg_RE_all     %>% mutate(analysis = "random_effects_all"),
+  reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
+)
 
+write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
