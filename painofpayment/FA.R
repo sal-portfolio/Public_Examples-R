@@ -7,6 +7,7 @@ library(psych)
 library(ordinal)
 library(rmcorr)
 
+source("painofpayment/FA functions.R")
 
   KMO_results = function(items, KMO_threshold) {
   kmo_result <- KMO(items)
