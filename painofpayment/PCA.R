@@ -7,18 +7,17 @@ library(psych)
 library(ordinal)
 library(rmcorr)
 
-my_funcs <- list(
 
   KMO_results = function(items, KMO_threshold) {
   kmo_result <- KMO(items)
   low_kmo_items <- names(kmo_result$MSAi[kmo_result$MSAi < KMO_threshold])
-  },
+  }
 
   factor_analysis = function(items) {
   #cortest.bartlett(items)
   pa_result <- fa.parallel(items, fa = "fa")
   fa_result <- fa(items, nfactors = pa_result$nfact, rotate = "oblimin", fm = "ml")
-  },
+  }
   
   corr_results = function(vars, factor_data, prod_pooled, id) {
   pairs <- combn(vars, 2, simplify = FALSE)
@@ -53,7 +52,7 @@ my_funcs <- list(
      r = round(r, 3)
     )
   corr_summary %>% as.data.frame()  
-  },
+  }
   
   reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
   factor_data[[y]] <- as.ordered(factor_data[[y]])
@@ -87,7 +86,7 @@ my_funcs <- list(
   stats_predictors_only <- ordinal_stats %>%
     filter(term %in% x_vars)
     }
-)
+
 
 
 ################ETL###########################################
