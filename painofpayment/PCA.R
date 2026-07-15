@@ -128,6 +128,9 @@ df_long <- df_long %>%
     makes_life_easier = `45`,
     makes_life_more_convenient = `46`
   )
+################################################################################
+#Option 1: Pooling across product i, running analysis at level of individual j#
+################################################################################
 
 #for factor analysis, average scores within person across products
 person_level_long <- df_long %>%
@@ -200,7 +203,7 @@ corr_summary <- corr_summary %>%
   )
 
 corr_summary %>% as.data.frame()
-write_csv(corr_summary, "painofpayment/output/Study6corr_summary.csv")
+write_csv(corr_summary, "painofpayment/output/Study6_j_corrs.csv")
 
 #running reg (ordinal logistic)
 model_data <- person_level_long %>%
@@ -241,4 +244,112 @@ ordinal_stats_predictors_only <- ordinal_stats %>%
 
 # dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
 
-write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6ordinal_model_stats.csv")
+write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6_j_model.csv")
+
+
+################################################################################
+#Option 2: Running analysis at level of product i x individual j#
+################################################################################
+
+#for factor analysis, not adjusting for repeated measures (3 products per j)
+
+
+items <- df_long %>%
+  dplyr::select(too_high:makes_life_more_convenient)  
+KMO(items)
+cortest.bartlett(items)
+fa.parallel(items, fa = "fa")
+fa_result <- fa(items, nfactors = 8, rotate = "oblimin", fm = "ml")
+print(fa_result, cut = 0.55, sort = TRUE)
+fa_result$communality
+
+####saving full-load factors at the individual-level (*pooled across products)
+factor_scores <- as.data.frame(fa_result$scores)
+
+person_level_long <- person_level_long %>%
+  bind_cols(factor_scores) %>%
+  rename(
+    f_convenience = ML1,
+    f_choice = ML8,
+    f_expectfree = ML2,
+    f_overpriced = ML4,
+    f_tangible = ML6,
+    f_longlasting = ML3,
+    f_budget_strain = ML7,
+    f_complementary = ML5
+  )
+#checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
+vars <- c("painful_1", grep("^f_", names(person_level_long), value = TRUE))
+pairs <- combn(vars, 2, simplify = FALSE)
+
+corr_results <- list()
+
+for (pair in pairs) {
+  var1 <- pair[1]
+  var2 <- pair[2]
+  pair_name <- paste0(var1, "_", var2)
+  
+  result <- cor.test(person_level_long[[var1]], person_level_long[[var2]])
+  
+  corr_results[[pair_name]] <- result
+}
+
+#save as csv a table showing corr results
+corr_summary <- map_dfr(corr_results, ~ tibble(
+  r = .x$estimate,
+  df = .x$parameter,
+  p_value = .x$p.value
+), .id = "pair")
+
+corr_summary <- corr_summary %>%
+  mutate(
+    p_value = case_when(
+      p_value < .001 ~ "p<.001",
+      TRUE ~ paste0("p=", round(p_value, 3))
+    ),
+    r = round(r, 3)
+  )
+
+corr_summary %>% as.data.frame()
+write_csv(corr_summary, "painofpayment/output/Study6_j_corrs.csv")
+
+#running reg (ordinal logistic)
+model_data <- person_level_long %>%
+  mutate(painful_1 = as.ordered(painful_1))
+
+# Dynamically grab every column starting with "f_"
+f_vars <- grep("^f_", names(model_data), value = TRUE)
+
+# Build the formula using all f_ predictors
+formula_str <- paste("painful_1 ~", paste(f_vars, collapse = " + "))
+ordinal_formula <- as.formula(formula_str)
+
+ordinal_model <- polr(ordinal_formula, data = model_data, Hess = TRUE)
+
+summary(ordinal_model)
+
+coef_table <- coef(summary(ordinal_model))
+p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
+coef_table <- cbind(coef_table, p_value = p_values)
+
+ordinal_stats <- as.data.frame(coef_table)
+ordinal_stats$term <- rownames(ordinal_stats)
+
+ordinal_stats <- ordinal_stats %>%
+  dplyr::select(term, Value, `Std. Error`, p_value) %>%
+  mutate(
+    Value = round(Value, 3),
+    `Std. Error` = round(`Std. Error`, 3),
+    p_value = case_when(
+      p_value < .001 ~ "p<.001",
+      TRUE ~ paste0("p=", round(p_value, 3))
+    )
+  )
+
+# Create table output; filter to just the predictor rows, using the same dynamic f_vars list
+ordinal_stats_predictors_only <- ordinal_stats %>%
+  filter(term %in% f_vars)
+
+# dir.create("painofpayment/output", recursive = TRUE, showWarnings = FALSE)
+
+write_csv(ordinal_stats_predictors_only, "painofpayment/output/Study6_j_model.csv")
