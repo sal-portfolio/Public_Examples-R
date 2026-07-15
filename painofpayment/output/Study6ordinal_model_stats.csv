@@ -1,9 +1,0 @@
-term,Value,Std. Error,p_value
-f_expectfree,-0.498,0.162,p=0.002
-f_complementary,-0.509,0.154,p<.001
-f_budget_strain,-0.134,0.161,p=0.408
-f_convenience,1.087,0.183,p<.001
-f_longlasting,-0.212,0.141,p=0.131
-f_choice,0.044,0.14,p=0.75
-f_tangible,0.915,0.172,p<.001
-f_overpriced,0.183,0.156,p=0.24
