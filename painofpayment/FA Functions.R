@@ -80,7 +80,7 @@ reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
     
   } else {
     ordinal_formula <- as.formula(paste(y, "~", paste(x_vars, collapse = " + "), "+ (1 |", id, ")"))
-    ordinal_model <- clmm(ordinal_formula, data = factor_data)
+    ordinal_model <- clmm(ordinal_formula, data = factor_data, control = clmm.control(maxIter = 1000, gradTol = 1e-6, maxLineIter = 100))
     
     coef_table <- coef(summary(ordinal_model))
     coef_table <- cbind(coef_table, p_value = coef_table[, "Pr(>|z|)"])

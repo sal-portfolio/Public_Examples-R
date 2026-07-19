@@ -59,6 +59,7 @@ reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all)
 reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 
+
 #######writing outputs
 corr_all_combined <- bind_rows(
   #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
