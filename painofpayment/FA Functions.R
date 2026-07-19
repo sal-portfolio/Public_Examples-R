@@ -1,3 +1,6 @@
+
+# Pain of Payment Study 6
+# Author: Amanda
 ##This file creates functions for running factor analysis, inter-factor corrs, and regressions
 ##can be used for individual-level (j) or individual-product level (ij) data, filtered by KMO results
 

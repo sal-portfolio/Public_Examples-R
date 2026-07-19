@@ -1,15 +1,9 @@
+
 # Pain of Payment Study 6
 # Author: Amanda
+#####ETL Only####
 
-library(MASS)
-library(tidyverse)
-library(psych)
-library(ordinal)
-library(rmcorr)
 
-source("painofpayment/FA functions.R")
-
-################ETL###########################################
 # Read raw header without deduplication, to preserve true positions
 # of repeated column names (prod_1_1 through prod_1_46 appear 3 times)
 raw_names <- read_csv("painofpayment/data/PoP+Factor+Analysis+10-16-25_July+9,+2026_17.33.csv", n_max = 0, name_repair = "minimal") %>% names()
@@ -143,68 +137,3 @@ person_level_long <- df_long %>%
     across(where(is.character), ~ first(.x)),
     .groups = "drop"
   )
-################################################################################
-#Factor analysis across product i and person j (multiple i per j)#
-################################################################################
-
-# select items to run factor analysis on person_level or person-product level #
-items_j <- person_level_long %>%
-  dplyr::select(too_high:makes_life_more_convenient)  
-items_ij <- df_long %>%
-  dplyr::select(too_high:makes_life_more_convenient)  
-
-#running factor analysis w/ or w/out low kmo results
-# low_kmo_j <- KMO_results(items_j, 0.7)
-# low_kmo_ij <- KMO_results(items_ij, 0.7)
-# items_j_highkmo <- items_j[, !(names(items_j) %in% low_kmo_j)]
-# items_ij_highkmo <- items_ij[, !(names(items_ij) %in% low_kmo_ij)]
-
-
-fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
-# fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
-fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
-# fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
-
-#print(factor_analysis(items_j)$model, cut = 0.5)  
-
-# person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
-# df_long_kmo <- cbind(df_long, fa_ij_highkmo)
-person_level_long_all <- cbind(person_level_long, fa_j_all)
-df_long_all <- cbind(df_long, fa_ij_all)
-
-
-#checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
-
-# corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
-corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
-# corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
-corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
-
-
-################################################################################
-#Running regressions
-################################################################################
-
-reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all), TRUE, "ResponseId")
-# reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
-reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
-# reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
-
-#######writing outputs
-corr_all_combined <- bind_rows(
-  #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
-  corr_j_all       %>% mutate(analysis = "person_level_all"),
-  #corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
-  corr_ij_all      %>% mutate(analysis = "person_product_all")
-)
-
-write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", row.names = FALSE)
-
-reg_all_combined <- bind_rows(
-  reg_pooled_all %>% mutate(analysis = "pooled_all"),
- # reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
-  reg_RE_all     %>% mutate(analysis = "random_effects_all"),
-  # reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
-)
-
-write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
