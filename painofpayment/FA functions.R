@@ -1,10 +1,10 @@
 ##This file creates functions for running factor analysis, inter-factor corrs, and regressions
 ##can be used for individual-level (j) or individual-product level (ij) data, filtered by KMO results
 
-  KMO_results <- function(items, KMO_threshold) {
-  kmo_result <- KMO(items)
-  low_kmo_items <- names(kmo_result$MSAi[kmo_result$MSAi < KMO_threshold])
-  }
+  # KMO_results <- function(items, KMO_threshold) {
+  # kmo_result <- KMO(items)
+  # low_kmo_items <- names(kmo_result$MSAi[kmo_result$MSAi < KMO_threshold])
+  # }
 
   factor_analysis = function(items) {
   #cortest.bartlett(items)
@@ -17,8 +17,8 @@
   })
   top_items <- make.unique(top_items, sep = "_")
   
-  colnames(fa_result$loadings) <- top_items
-  colnames(fa_result$scores) <- top_items
+  colnames(fa_result$loadings) <- paste0("f_", top_items)
+  colnames(fa_result$scores) <- paste0("f_", top_items)
   
   list(
     model = fa_result,

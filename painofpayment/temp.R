@@ -1,5 +1,3 @@
-# Pain of Payment Study 6
-# Author: Amanda
 
 library(MASS)
 library(tidyverse)
@@ -7,7 +5,7 @@ library(psych)
 library(ordinal)
 library(rmcorr)
 
-source("painofpayment/FA functions.R")
+
 
 ################ETL###########################################
 # Read raw header without deduplication, to preserve true positions
@@ -150,51 +148,89 @@ person_level_long <- df_long %>%
 # select items to run factor analysis on person_level or person-product level #
 items_j <- person_level_long %>%
   dplyr::select(too_high:makes_life_more_convenient)  
-items_ij <- df_long %>%
-  dplyr::select(too_high:makes_life_more_convenient)  
 
-#running factor analysis w/ or w/out low kmo results
-# low_kmo_j <- KMO_results(items_j, 0.7)
-# low_kmo_ij <- KMO_results(items_ij, 0.7)
-# items_j_highkmo <- items_j[, !(names(items_j) %in% low_kmo_j)]
-# items_ij_highkmo <- items_ij[, !(names(items_ij) %in% low_kmo_ij)]
-
+pa_result <- fa.parallel(items_j, fa = "fa")
+fa_result <- fa(items_j, nfactors = pa_result$nfact, rotate = "oblimin", fm = "ml")
+print(fa_result, cut = 0.6)
+  #rename factors according to top item loadings
+  loadings_mat <- unclass(fa_result$loadings)
+  top_items <- apply(loadings_mat, 2, function(col) {
+    rownames(loadings_mat)[which.max(abs(col))]
+  })
+  top_items <- make.unique(top_items, sep = "_")
+  
+  colnames(fa_result$loadings) <- paste0("f_",top_items)
+  colnames(fa_result$scores) <- paste0("f_",top_items)
+  
+  list(
+    model = fa_result,
+    scores = as.data.frame(fa_result$scores)
+  )
+******** added f_ to the front
 
 fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
-# fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
+fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
 fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
-# fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
+fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
 
 #print(factor_analysis(items_j)$model, cut = 0.5)  
 
-# person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
-# df_long_kmo <- cbind(df_long, fa_ij_highkmo)
-person_level_long_all <- cbind(person_level_long, fa_j_all)
+person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
+df_long_kmo <- cbind(df_long, fa_ij_highkmo)
+person_level_long_all <- cbind(person_level_long, fa_result$scores)
 df_long_all <- cbind(df_long, fa_ij_all)
 
 
 #checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
 
-# corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
-corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
-# corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
+corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
+corr_j_all <- corr_results(colnames(fa_result$scores), person_level_long_all, TRUE, "ResponseId")
+corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
 corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
+ pairs <- combn(colnames(fa_result$scores), 2, simplify = FALSE)
+  corr_results <- list()
+  for (pair in pairs) {
+    var1 <- pair[1]
+    var2 <- pair[2]
+    pair_name <- paste0(var1, "_", var2)
+    result <- cor.test(person_level_long_all[[var1]], person_level_long_all[[var2]])
+    
+    corr_results[[pair_name]] <- result
+  }
+
+
+  corr_summary <- map_dfr(corr_results, function(x) {
+   
+      tibble(r = x$estimate, df = x$parameter, p_value = x$p.value)
+    
+  }, .id = "pair")
+
+  corr_summary <- corr_summary %>%
+    mutate(
+      p_value = case_when(
+       p_value < .001 ~ "p<.001",
+       TRUE ~ paste0("p=", round(p_value, 3))
+     ),
+     r = round(r, 3)
+    )
+  corr_summary %>% as.data.frame()  
+  
 
 ################################################################################
 #Running regressions
 ################################################################################
 
 reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all), TRUE, "ResponseId")
-# reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
+reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
 reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
-# reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
+reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 
 #######writing outputs
 corr_all_combined <- bind_rows(
-  #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
+  corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
   corr_j_all       %>% mutate(analysis = "person_level_all"),
-  #corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
+  corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
   corr_ij_all      %>% mutate(analysis = "person_product_all")
 )
 
@@ -202,9 +238,9 @@ write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", 
 
 reg_all_combined <- bind_rows(
   reg_pooled_all %>% mutate(analysis = "pooled_all"),
- # reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
+  reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
   reg_RE_all     %>% mutate(analysis = "random_effects_all"),
-  # reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
+  reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
 )
 
 write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
