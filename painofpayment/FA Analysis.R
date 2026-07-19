@@ -34,7 +34,7 @@ fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
 fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
 # fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
 
-#print(factor_analysis(items_j)$model, cut = 0.5)  
+#print(factor_analysis(items_ij)$model, cut = 0.5)  
 
 # person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
 # df_long_kmo <- cbind(df_long, fa_ij_highkmo)

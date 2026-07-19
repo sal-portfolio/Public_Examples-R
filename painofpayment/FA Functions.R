@@ -16,10 +16,13 @@
   #rename factors according to top item loadings
   loadings_mat <- unclass(fa_result$loadings)
   top_items <- apply(loadings_mat, 2, function(col) {
-    rownames(loadings_mat)[which.max(abs(col))]
-  })
+    
+  top_idx <- which.max(abs(col))
+  item_name <- rownames(loadings_mat)[top_idx]
+  if (col[top_idx] < 0) paste0("neg_", item_name) else item_name
+    })
   top_items <- make.unique(top_items, sep = "_")
-  
+
   colnames(fa_result$loadings) <- paste0("f_", top_items)
   colnames(fa_result$scores) <- paste0("f_", top_items)
   

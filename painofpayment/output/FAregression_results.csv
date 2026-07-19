@@ -7,7 +7,7 @@
 "f_use_long_period",0.044,0.14,"p=0.75","pooled_all"
 "f_budget_strain",0.915,0.172,"p<.001","pooled_all"
 "f_worthless_alone",0.183,0.156,"p=0.24","pooled_all"
-"f_have_choice",1.066,0.147,"p<.001","random_effects_all"
+"f_neg_have_choice",1.066,0.147,"p<.001","random_effects_all"
 "f_makes_life_more_convenient",-0.244,0.135,"p=0.07","random_effects_all"
 "f_expect_free",0.199,0.134,"p=0.14","random_effects_all"
 "f_too_high",1.545,0.163,"p<.001","random_effects_all"
