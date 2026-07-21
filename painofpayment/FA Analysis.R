@@ -21,7 +21,9 @@ items_j <- person_level_long %>%
   dplyr::select(too_high:makes_life_more_convenient)  
 items_ij <- df_long %>%
   dplyr::select(too_high:makes_life_more_convenient)  
-
+items_prod1 <- df_long %>%
+  dplyr::filter(Category == "prod_1") %>%
+  dplyr::select(too_high:makes_life_more_convenient)
 #running factor analysis w/ or w/out low kmo results
 # low_kmo_j <- KMO_results(items_j, 0.7)
 # low_kmo_ij <- KMO_results(items_ij, 0.7)
@@ -32,6 +34,10 @@ items_ij <- df_long %>%
 fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
 # fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
 fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
+
+fa_prod1 <- factor_analysis(items_prod1)
+scores_full <- psych::factor.scores(items_ij, fa_prod1)$scores
+
 # fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
 
 #print(factor_analysis(items_ij)$model, cut = 0.5)  
@@ -40,6 +46,8 @@ fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
 # df_long_kmo <- cbind(df_long, fa_ij_highkmo)
 person_level_long_all <- cbind(person_level_long, fa_j_all)
 df_long_all <- cbind(df_long, fa_ij_all)
+df_long_scored <- df_long %>%
+  dplyr::bind_cols(as.data.frame(scores_full))
 
 
 #checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
@@ -58,6 +66,7 @@ reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all)
 # reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
 reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
+reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", colnames(fa_prod1$scores), FALSE, "ResponseId")
 
 
 #######writing outputs
@@ -73,8 +82,9 @@ write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", 
 reg_all_combined <- bind_rows(
   reg_pooled_all %>% mutate(analysis = "pooled_all"),
  # reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
-  reg_RE_all     %>% mutate(analysis = "random_effects_all"),
+  reg_RE_all     %>% mutate(analysis = "RE_FAonAllProds"),
   # reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
+  reg_RE_prod1fa %>% mutate(analysis = "RE_FAonProd1")
 )
 
 write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)

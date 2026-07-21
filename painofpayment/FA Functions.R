@@ -26,10 +26,7 @@
   colnames(fa_result$loadings) <- paste0("f_", top_items)
   colnames(fa_result$scores) <- paste0("f_", top_items)
   
-  list(
-    model = fa_result,
-    scores = as.data.frame(fa_result$scores)
-  )
+fa_result
 }
 
 
