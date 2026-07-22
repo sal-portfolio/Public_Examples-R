@@ -57,7 +57,17 @@ corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "Respon
 # corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
 corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
-corr_prod1fa <- corr_results(c(colnames("painful_1", fa_prod1$scores)), df_long_scored, FALSE, "ResponseId")
+corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores)), df_long_scored, FALSE, "ResponseId")
+
+
+# df_select <- df_long_scored %>%
+#   dplyr::select(dplyr::all_of(c("painful_1", colnames(fa_prod1$scores))))
+
+# cor_matrix <- cor(df_select, use = "pairwise.complete.obs")
+# round(cor_matrix, 2)
+# cor_df <- as.data.frame(cor_matrix) %>%
+#   tibble::rownames_to_column(var = "variable")
+# write.csv(cor_df, "correlation_matrix_prod1FA.csv", row.names = FALSE, na = "")
 
 
 ################################################################################
@@ -84,7 +94,6 @@ FA_onProd1_output <- bind_rows(
 )
 
 write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
-
 
 
 
