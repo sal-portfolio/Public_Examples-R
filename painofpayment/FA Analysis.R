@@ -57,7 +57,7 @@ corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "Respon
 # corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
 corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
-corr_prod1fa <- corr_results(c(colnames(fa_prod1$scores), "painful_1"), df_long_scored, FALSE, "ResponseId")
+corr_prod1fa <- corr_results(c(colnames("painful_1", fa_prod1$scores)), df_long_scored, FALSE, "ResponseId")
 
 
 ################################################################################
