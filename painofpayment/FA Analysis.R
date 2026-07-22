@@ -57,6 +57,8 @@ corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "Respon
 # corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
 corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
+corr_prod1fa <- corr_results(c(colnames(fa_prod1$scores), "painful_1"), df_long_scored, FALSE, "ResponseId")
+
 
 ################################################################################
 #Running regressions
@@ -70,11 +72,28 @@ reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", colnames(fa_prod1$scor
 
 
 #######writing outputs
+
+loadings_matrix <- unclass(fa_prod1$loadings)
+loadings_df <- as.data.frame(loadings_matrix) %>%
+  tibble::rownames_to_column(var = "item")
+
+FA_onProd1_output <- bind_rows(
+  loadings_df %>% mutate (analysis = "factor anaysis"),
+  corr_prod1fa %>% mutate(analysis = "factor score correlations"),
+  reg_RE_prod1fa %>% mutate(analysis = "ordinal logistic regression, person REs")
+)
+
+write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
+
+
+
+
 corr_all_combined <- bind_rows(
   #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
   corr_j_all       %>% mutate(analysis = "person_level_all"),
   #corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
-  corr_ij_all      %>% mutate(analysis = "person_product_all")
+  corr_ij_all      %>% mutate(analysis = "person_product_all"),
+  corr_prod1fa %>% mutate(analysis = "person_product_FAonProd1")
 )
 
 write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", row.names = FALSE)
@@ -88,3 +107,4 @@ reg_all_combined <- bind_rows(
 )
 
 write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
+
