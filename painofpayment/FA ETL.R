@@ -126,6 +126,26 @@ df_long <- df_long %>%
     makes_life_easier = `45`,
     makes_life_more_convenient = `46`
   )
+### result filtering 
+df_long <- df_long %>%
+  dplyr::select(
+    worthless_alone,
+    value_with_others,
+    should_come_included,
+    have_choice,
+    have_other_options,
+    no_real_alternatives,
+    can_hold_touch,
+    physical_product,
+    businesses_give_away_free,
+    people_dont_pay_money ,
+    expect_free ,
+    should_be_free ,
+    saves_time ,
+    makes_life_easier ,
+    makes_life_more_convenient 
+  )
+
 
 ######## Pooling by product (person-level j analysis)##########
 #create person-level df
