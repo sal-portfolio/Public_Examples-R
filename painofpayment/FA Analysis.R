@@ -18,12 +18,17 @@ source("painofpayment/FA ETL.R")
 
 # select items to run factor analysis on person_level or person-product level #
 items_j <- person_level_long %>%
-  dplyr::select(too_high:makes_life_more_convenient)  
+  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+  -typ_charge, -fair_price, -like_1, -value_1, -purchased)  
 items_ij <- df_long %>%
-  dplyr::select(too_high:makes_life_more_convenient)  
+  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+  -typ_charge, -fair_price, -like_1, -value_1, -purchased, -Item, -Item2, 
+  -Item3, -Category )  
 items_prod1 <- df_long %>%
   dplyr::filter(Category == "prod_1") %>%
-  dplyr::select(too_high:makes_life_more_convenient)
+  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+  -typ_charge, -fair_price, -like_1, -value_1, -purchased, -Item, -Item2,
+  -Item3, -Category)
 #running factor analysis w/ or w/out low kmo results
 # low_kmo_j <- KMO_results(items_j, 0.7)
 # low_kmo_ij <- KMO_results(items_ij, 0.7)
