@@ -127,23 +127,25 @@ df_long <- df_long %>%
     makes_life_more_convenient = `46`
   )
 ### result filtering 
+drop_items <- c(
+  "too_high", "overpriced", "ripoff", "expensive",                    # 1–4
+  "worth_price", "cheaper_not_different",                             # 5–6
+  "budget_strain", "needs_wealth", "extra_money_to_spare",            # 7–9
+  "helps_other_things",                                               # 11
+  "wouldnt_buy_if_not_required", "unnecessary",                       # 14, 16
+  "negative_consequences_if_not", "feel_powerless",                   # 20–21
+  "cant_control_timing",                                              # 22
+  "purchase_regularly", "buy_similar_soon",                           # 23–24
+  "always_pretty_much_same", "recurring_bill",                        # 25–26
+  "very_aware_when_charged", "always_have_to_pay",                    # 27–28
+  "can_physically_keep", "use_long_period",                           # 31–32
+  "lasts_a_while", "feels_like_investment",                           # 33–34
+  "roughly_the_same_anywhere", "many_different_types",                # 39–40
+  "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
+  "learn_quality_after_purchase"                                      # 43
+)
 df_long <- df_long %>%
-  dplyr::select(
-    worthless_alone,
-    value_with_others,
-    should_come_included,
-    have_choice,
-    have_other_options,
-    no_real_alternatives,
-    can_hold_touch,
-    physical_product,
-    businesses_give_away_free,
-    people_dont_pay_money ,
-    expect_free ,
-    should_be_free ,
-    saves_time ,
-    makes_life_easier ,
-    makes_life_more_convenient 
+  dplyr::select(-all_of(drop_items)
   )
 
 
