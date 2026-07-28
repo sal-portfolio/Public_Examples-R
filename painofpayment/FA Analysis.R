@@ -106,7 +106,7 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-write.csv(FA_onProd1_output, "painofpayment/output/allbutexpensive2.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/allbutexpensive2_convenience.csv", row.names = FALSE, na = "")
 #write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
