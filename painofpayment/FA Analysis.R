@@ -106,8 +106,8 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-#write.csv(FA_onProd1_output, "painofpayment/output/addingtochoice.csv", row.names = FALSE, na = "")
- write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
+#write.csv(FA_onProd1_output, "painofpayment/output/paringdownfree.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
 
