@@ -142,7 +142,9 @@ drop_items <- c(
   "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
   "learn_quality_after_purchase", "should_come_included",
   "people_dont_pay_money", "saves_time", "makes_life_easier",
-  "makes_life_more_convenient"                       # 43
+  "makes_life_more_convenient" ,
+  "businesses_give_away_free", "expect_free", "should_be_free"
+                        # 43
 )
 df_long <- df_long %>%
   dplyr::select(-all_of(drop_items)

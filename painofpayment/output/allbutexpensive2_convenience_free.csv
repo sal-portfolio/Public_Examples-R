@@ -1,0 +1,36 @@
+"item","f_neg_have_choice","f_overpriced","f_lasts_a_while","f_physical_product","f_worthless_alone","analysis","pair","r","df","p_value","term","Value","Std. Error"
+"too_high",-0.00457437741286748,0.771938147263128,-0.0786228960795886,0.0237826064550235,0.174233683114847,"factor anaysis",,,,,,,
+"overpriced",0.0451807486611377,0.868619888344606,-0.0545016416650985,-0.0152510931127198,0.0205138243930815,"factor anaysis",,,,,,,
+"expensive",-0.0169360011667743,0.819929175109071,0.109254142764056,-0.0187521859612297,-0.137980061098948,"factor anaysis",,,,,,,
+"worthless_alone",-0.0156670279941767,0.0380354665085161,-0.0169007721463249,0.0172594370058109,0.956665216199646,"factor anaysis",,,,,,,
+"value_with_others",0.0429977044220087,-0.0491832759556054,0.101624889181038,-0.0361165584833023,0.761742487533605,"factor anaysis",,,,,,,
+"have_choice",-0.825473415930871,-0.00567197614707033,0.059137038681801,-0.0496035532600704,0.0256168309298562,"factor anaysis",,,,,,,
+"have_other_options",-0.62763831778581,0.19959088399039,-0.0221213715853922,0.00612346802031108,-0.0276664439005233,"factor anaysis",,,,,,,
+"no_real_alternatives",0.643213703993948,-0.0124921249351098,-0.0391586434431073,-0.108492325511491,0.138143330012752,"factor anaysis",,,,,,,
+"negative_consequences_if_not",0.774170619769717,0.06932734831731,0.024437790104748,0.00428409915020627,-0.0357348421232636,"factor anaysis",,,,,,,
+"cant_control_timing",0.733825337090724,0.0681219897122689,0.0830371197124325,-0.0206815257893575,-0.0172631519435488,"factor anaysis",,,,,,,
+"can_hold_touch",0.00353377518963541,-0.0714464562614153,-0.0168197570845336,0.809880185201454,-0.0409709320907226,"factor anaysis",,,,,,,
+"physical_product",-0.00245327892051315,0.0341160366878229,0.0159829557406395,0.999732761083163,0.0244294063875477,"factor anaysis",,,,,,,
+"use_long_period",-0.0313340028659778,-0.00170022938595192,0.845388999026888,-0.0169058359426468,0.0329154428527349,"factor anaysis",,,,,,,
+"lasts_a_while",0.0231111069491286,-0.0043940590241266,0.991063141048205,0.0193136048583421,0.00507653264744676,"factor anaysis",,,,,,,
+,,,,,,"factor score correlations","painful_1_f_neg_have_choice",0.247,399,"p<.001",,,
+,,,,,,"factor score correlations","painful_1_f_overpriced",0.705,399,"p<.001",,,
+,,,,,,"factor score correlations","painful_1_f_lasts_a_while",-0.062,399,"p=0.213",,,
+,,,,,,"factor score correlations","painful_1_f_physical_product",-0.237,399,"p<.001",,,
+,,,,,,"factor score correlations","painful_1_f_worthless_alone",0.056,399,"p=0.264",,,
+,,,,,,"factor score correlations","f_neg_have_choice_f_overpriced",0.121,399,"p=0.015",,,
+,,,,,,"factor score correlations","f_neg_have_choice_f_lasts_a_while",0.115,399,"p=0.021",,,
+,,,,,,"factor score correlations","f_neg_have_choice_f_physical_product",-0.245,399,"p<.001",,,
+,,,,,,"factor score correlations","f_neg_have_choice_f_worthless_alone",0.128,399,"p=0.01",,,
+,,,,,,"factor score correlations","f_overpriced_f_lasts_a_while",-0.168,399,"p<.001",,,
+,,,,,,"factor score correlations","f_overpriced_f_physical_product",-0.17,399,"p<.001",,,
+,,,,,,"factor score correlations","f_overpriced_f_worthless_alone",0.097,399,"p=0.051",,,
+,,,,,,"factor score correlations","f_lasts_a_while_f_physical_product",0.073,399,"p=0.143",,,
+,,,,,,"factor score correlations","f_lasts_a_while_f_worthless_alone",0.211,399,"p<.001",,,
+,,,,,,"factor score correlations","f_physical_product_f_worthless_alone",-0.15,399,"p=0.003",,,
+,,,,,,"ordinal logistic regression, person REs",,,,"p<.001","f_neg_have_choice",0.339,0.103
+,,,,,,"ordinal logistic regression, person REs",,,,"p<.001","f_overpriced",2.378,0.164
+,,,,,,"ordinal logistic regression, person REs",,,,"p=0.209","f_lasts_a_while",0.129,0.103
+,,,,,,"ordinal logistic regression, person REs",,,,"p=0.003","f_physical_product",-0.299,0.101
+,,,,,,"ordinal logistic regression, person REs",,,,"p=0.182","f_worthless_alone",-0.143,0.107
+,,,,,,"ordinal logistic regression, person REs",,,,,"McFadden's pseudo-R2",0.184,
