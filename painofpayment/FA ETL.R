@@ -138,8 +138,7 @@ drop_items <- c(
   "purchase_regularly", "buy_similar_soon",                           # 23–24
   "always_pretty_much_same", "recurring_bill",                        # 25–26
   "very_aware_when_charged", "always_have_to_pay",                    # 27–28
-  "can_physically_keep", "use_long_period",                           # 31–32
-  "lasts_a_while", "feels_like_investment",                           # 33–34
+  "can_physically_keep", "feels_like_investment",                           # 33–34
   "roughly_the_same_anywhere", "many_different_types",                # 39–40
   "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
   "learn_quality_after_purchase"                                      # 43
