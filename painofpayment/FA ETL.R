@@ -128,20 +128,20 @@ df_long <- df_long %>%
   )
 ### result filtering 
 drop_items <- c(
-  "too_high", "ripoff",  "expensive",                    # 1–4
+  "too_high", "ripoff", "overpriced", "expensive",                    # 1–4
   "worth_price", "cheaper_not_different",                             # 5–6
-  "extra_money_to_spare",            # 7–9
+  "budget_strain", "extra_money_to_spare", "needs_wealth",           # 7–9
   "helps_other_things",                                               # 11
   "wouldnt_buy_if_not_required", "unnecessary",                       # 14, 16
-  "negative_consequences_if_not", "feel_powerless",                   # 20–21
-  "cant_control_timing",                                              # 22
+  "feel_powerless", 
+  "cant_control_timing",  "negative_consequences_if_not",                                             # 22
   "purchase_regularly", "buy_similar_soon",                           # 23–24
   "always_pretty_much_same", "recurring_bill",                        # 25–26
   "very_aware_when_charged", "always_have_to_pay",                    # 27–28
   "can_physically_keep", "feels_like_investment",                           # 33–34
   "roughly_the_same_anywhere", "many_different_types",                # 39–40
   "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
-  "learn_quality_after_purchase"                                      # 43
+  "learn_quality_after_purchase"                                   # 43
 )
 df_long <- df_long %>%
   dplyr::select(-all_of(drop_items)
