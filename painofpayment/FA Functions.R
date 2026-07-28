@@ -78,13 +78,24 @@ reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
     p_values <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
     coef_table <- cbind(coef_table, p_value = p_values)
     
+        # McFadden pseudo-R^2: intercept-only null with same data
+    null_model <- polr(as.formula(paste(y, "~ 1")), data = factor_data, Hess = TRUE)
+    mcfadden_r2 <- as.numeric(1 - logLik(ordinal_model) / logLik(null_model))
+
   } else {
     ordinal_formula <- as.formula(paste(y, "~", paste(x_vars, collapse = " + "), "+ (1 |", id, ")"))
     ordinal_model <- clmm(ordinal_formula, data = factor_data, control = clmm.control(maxIter = 1000, gradTol = 1e-6, maxLineIter = 100))
     
     coef_table <- coef(summary(ordinal_model))
     coef_table <- cbind(coef_table, p_value = coef_table[, "Pr(>|z|)"])
+
+     # McFadden pseudo-R^2: random-intercept-only null (same random structure)
+    null_formula <- as.formula(paste(y, "~ 1 + (1 |", id, ")"))
+    null_model <- clmm(null_formula, data = factor_data,
+                       control = clmm.control(maxIter = 1000, gradTol = 1e-6, maxLineIter = 100))
+    mcfadden_r2 <- as.numeric(1 - logLik(ordinal_model) / logLik(null_model))
   }
+
 
   ordinal_stats <- as.data.frame(coef_table)
   ordinal_stats$term <- rownames(ordinal_stats)
@@ -105,7 +116,8 @@ reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
     )
   # Create table output; filter to just the predictor rows, using the same dynamic f_vars list
 
-  ordinal_stats %>%
-    filter(term %in% x_vars)
+  out <- ordinal_stats %>% filter(term %in% x_vars)
+  attr(out, "mcfadden_r2") <- round(mcfadden_r2, 3)
+  out
 }
 

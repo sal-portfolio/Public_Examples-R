@@ -92,33 +92,42 @@ loadings_matrix <- unclass(fa_prod1$loadings)
 loadings_df <- as.data.frame(loadings_matrix) %>%
   tibble::rownames_to_column(var = "item")
 
+# Pull the McFadden R^2 off the regression output and make it its own row
+  r2_prod1fa <- tibble::tibble(
+  term = "McFadden's pseudo-R2",
+  Value = attr(reg_RE_prod1fa, "mcfadden_r2"),
+  analysis = "ordinal logistic regression, person REs"
+)
+
 FA_onProd1_output <- bind_rows(
   loadings_df %>% mutate (analysis = "factor anaysis"),
   corr_prod1fa %>% mutate(analysis = "factor score correlations"),
-  reg_RE_prod1fa %>% mutate(analysis = "ordinal logistic regression, person REs")
+  reg_RE_prod1fa %>% mutate(analysis = "ordinal logistic regression, person REs"),
+  r2_prod1fa
 )
 
 write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
+# write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
 
-corr_all_combined <- bind_rows(
-  #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
-  corr_j_all       %>% mutate(analysis = "person_level_all"),
-  #corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
-  corr_ij_all      %>% mutate(analysis = "person_product_all"),
-  corr_prod1fa %>% mutate(analysis = "person_product_FAonProd1")
-)
+# corr_all_combined <- bind_rows(
+#   #corr_j_highkmo   %>% mutate(analysis = "person_level_highkmo"),
+#   corr_j_all       %>% mutate(analysis = "person_level_all"),
+#   #corr_ij_highkmo  %>% mutate(analysis = "person_product_highkmo"),
+#   corr_ij_all      %>% mutate(analysis = "person_product_all"),
+#   corr_prod1fa %>% mutate(analysis = "person_product_FAonProd1")
+# )
 
-write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", row.names = FALSE)
+# write.csv(corr_all_combined, "painofpayment/output/FA_correlation_results.csv", row.names = FALSE)
 
-reg_all_combined <- bind_rows(
-  reg_pooled_all %>% mutate(analysis = "pooled_all"),
- # reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
-  reg_RE_all     %>% mutate(analysis = "RE_FAonAllProds"),
-  # reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
-  reg_RE_prod1fa %>% mutate(analysis = "RE_FAonProd1")
-)
+# reg_all_combined <- bind_rows(
+#   reg_pooled_all %>% mutate(analysis = "pooled_all"),
+#  # reg_pooled_kmo %>% mutate(analysis = "pooled_highkmo"),
+#   reg_RE_all     %>% mutate(analysis = "RE_FAonAllProds"),
+#   # reg_RE_kmo     %>% mutate(analysis = "random_effects_highkmo")
+#   reg_RE_prod1fa %>% mutate(analysis = "RE_FAonProd1")
+# )
 
-write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
+# write.csv(reg_all_combined, "painofpayment/output/FAregression_results.csv", row.names = FALSE)
 
