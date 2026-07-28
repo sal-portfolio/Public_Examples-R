@@ -128,7 +128,7 @@ df_long <- df_long %>%
   )
 ### result filtering 
 drop_items <- c(
-  "too_high", "overpriced", "ripoff", "expensive",                    # 1–4
+   "ripoff",                     # 1–4
   "worth_price", "cheaper_not_different",                             # 5–6
   "budget_strain", "needs_wealth", "extra_money_to_spare",            # 7–9
   "helps_other_things",                                               # 11
