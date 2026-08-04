@@ -86,9 +86,9 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_ch
 #reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 
-ind_vars <- c(colnames(fa_prod1$scores), "value_1", "purchased", "ln_disutility", "ln_typ_charge")
-drop <- c( "f_expect_free") 
-ind_vars <- ind_vars[!(ind_vars %in% drop)]
+ind_vars <- c(colnames(fa_prod1$scores), "value_1", "purchased", "ln_disutility")
+#drop <- c( "f_expect_free") 
+#ind_vars <- ind_vars[!(ind_vars %in% drop)]
 reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", ind_vars, FALSE, "ResponseId")
 
 
