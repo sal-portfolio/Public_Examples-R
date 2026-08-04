@@ -22,12 +22,12 @@ source("painofpayment/FA ETL.R")
 #   -typ_charge, -fair_price, -like_1, -value_1, -purchased)  
 items_ij <- df_long %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
-  -typ_charge, -fair_price, -like_1, -value_1, -purchased, -Item, -Item2, 
+  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -like_1, -value_1, -purchased, -Item, -Item2, 
   -Item3, -Category )  
 items_prod1 <- df_long %>%
   dplyr::filter(Category == "prod_1") %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
-  -typ_charge, -fair_price, -like_1, -value_1, -purchased, -Item, -Item2,
+  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -like_1, -value_1, -purchased, -Item, -Item2,
   -Item3, -Category)
 #running factor analysis w/ or w/out low kmo results
 # low_kmo_j <- KMO_results(items_j, 0.7)
@@ -86,8 +86,7 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_ch
 #reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", 
-c(colnames(fa_prod1$scores), "ln_typ_charge",
-"like_1", "value_1"), FALSE, "ResponseId")
+c(colnames(fa_prod1$scores), "ln_typ_charge"), FALSE, "ResponseId")
 
 
 #######writing outputs
@@ -110,7 +109,7 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-write.csv(FA_onProd1_output, "painofpayment/output/not_disutility.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/final_onlytypical.csv", row.names = FALSE, na = "")
 #write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
