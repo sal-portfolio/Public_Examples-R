@@ -126,9 +126,13 @@ df_long <- df_long %>%
     makes_life_easier = `45`,
     makes_life_more_convenient = `46`
   )
+df_long <- df_long %>% mutate(ln_disutility =  ifelse(fair_price > typ_charge, log(1), log(typ_charge - fair_price + 1)))
+df_long <- df_long %>% mutate(ln_typ_charge = log(typ_charge)) 
+ # df_long[df_long$fair_typ_diff > 0, c("Item", "Item2", "Item3", "Category", "typ_charge")]
+
 ### result filtering 
 drop_items <- c(
-   "ripoff",                    # 1–4
+  "too_high", "ripoff",                    # 1–4
   "worth_price", "cheaper_not_different",                             # 5–6
    "budget_strain",  "needs_wealth",          # 7–9
   "helps_other_things",  "extra_money_to_spare",                                              # 11
@@ -141,10 +145,8 @@ drop_items <- c(
   "roughly_the_same_anywhere", "many_different_types",                # 39–40
   "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
   "learn_quality_after_purchase", "should_come_included",
-  "people_dont_pay_money", "saves_time", "makes_life_easier",
-  "makes_life_more_convenient" ,
-  "businesses_give_away_free", "expect_free", "should_be_free"
-                        # 43
+  "saves_time", "makes_life_easier",
+  "makes_life_more_convenient"
 )
 df_long <- df_long %>%
   dplyr::select(-all_of(drop_items)

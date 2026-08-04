@@ -114,7 +114,7 @@ reg_results = function(factor_data, y, x_vars, prod_pooled, id) {
         TRUE ~ paste0("p=", round(p_value, 3))
       )
     )
-  # Create table output; filter to just the predictor rows, using the same dynamic f_vars list
+  # Create table output; filter to just the predictor rows, using the same  f_vars list
 
   out <- ordinal_stats %>% filter(term %in% x_vars)
   attr(out, "mcfadden_r2") <- round(mcfadden_r2, 3)

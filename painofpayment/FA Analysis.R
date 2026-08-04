@@ -17,9 +17,9 @@ source("painofpayment/FA ETL.R")
 ################################################################################
 
 # select items to run factor analysis on person_level or person-product level #
-items_j <- person_level_long %>%
-  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
-  -typ_charge, -fair_price, -like_1, -value_1, -purchased)  
+# items_j <- person_level_long %>%
+#   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+#   -typ_charge, -fair_price, -like_1, -value_1, -purchased)  
 items_ij <- df_long %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
   -typ_charge, -fair_price, -like_1, -value_1, -purchased, -Item, -Item2, 
@@ -36,11 +36,12 @@ items_prod1 <- df_long %>%
 # items_ij_highkmo <- items_ij[, !(names(items_ij) %in% low_kmo_ij)]
 
 
-fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
-# fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
-fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
+# fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
+# # fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
+# fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
 
 fa_prod1 <- factor_analysis(items_prod1)
+#applying the factor loadings to all of the items (not just product 1)
 scores_full <- psych::factor.scores(items_ij, fa_prod1)$scores
 
 # fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
@@ -49,8 +50,8 @@ scores_full <- psych::factor.scores(items_ij, fa_prod1)$scores
 
 # person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
 # df_long_kmo <- cbind(df_long, fa_ij_highkmo)
-person_level_long_all <- cbind(person_level_long, fa_j_all)
-df_long_all <- cbind(df_long, fa_ij_all)
+# person_level_long_all <- cbind(person_level_long, fa_j_all)
+# df_long_all <- cbind(df_long, fa_ij_all)
 df_long_scored <- df_long %>%
   dplyr::bind_cols(as.data.frame(scores_full))
 
@@ -58,11 +59,12 @@ df_long_scored <- df_long %>%
 #checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
 
 # corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
-corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
+#corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
 # corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
-corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
+#corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
 
-corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores)), df_long_scored, FALSE, "ResponseId")
+corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_charge",
+"ln_disutility","like_1","value_1"), df_long_scored, FALSE, "ResponseId")
 
 
 # df_select <- df_long_scored %>%
@@ -79,11 +81,13 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores)), df_long_
 #Running regressions
 ################################################################################
 
-reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all), TRUE, "ResponseId")
+#reg_pooled_all <- reg_results(person_level_long_all,"painful_1", names(fa_j_all), TRUE, "ResponseId")
 # reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
-reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
+#reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
-reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", colnames(fa_prod1$scores), FALSE, "ResponseId")
+reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", 
+c(colnames(fa_prod1$scores),"ln_typ_charge",
+"ln_disutility","like_1", "value_1"), FALSE, "ResponseId")
 
 
 #######writing outputs
@@ -106,7 +110,7 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-write.csv(FA_onProd1_output, "painofpayment/output/allbutexpensive2_convenience_free.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/all_controls.csv", row.names = FALSE, na = "")
 #write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
