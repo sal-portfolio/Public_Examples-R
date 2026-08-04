@@ -85,8 +85,12 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_ch
 # reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
 #reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
+
+ind_vars <- c(colnames(fa_prod1$scores), "like_1", "ln_disutility")
+drop <- c("f_expect_free", "f_overpriced")
+ind_vars <- ind_vars[!(ind_vars %in% drop)]
 reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", 
-c(colnames(fa_prod1$scores), "ln_typ_charge"), FALSE, "ResponseId")
+ind_vars, FALSE, "ResponseId")
 
 
 #######writing outputs
@@ -109,7 +113,7 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-write.csv(FA_onProd1_output, "painofpayment/output/final_onlytypical.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/final_like_disutility_numonly.csv", row.names = FALSE, na = "")
 #write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 

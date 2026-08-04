@@ -128,7 +128,6 @@ df_long <- df_long %>%
   )
 df_long <- df_long %>% mutate(ln_disutility =  ifelse(fair_price > typ_charge, log(1), log(typ_charge - fair_price + 1)))
 df_long <- df_long %>% mutate(ln_typ_charge = log(typ_charge)) 
- # df_long[df_long$fair_typ_diff > 0, c("Item", "Item2", "Item3", "Category", "typ_charge")]
 
 ### result filtering 
 drop_items <- c(
