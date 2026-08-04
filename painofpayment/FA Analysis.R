@@ -86,8 +86,8 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_ch
 #reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
 reg_RE_prod1fa <- reg_results(df_long_scored,"painful_1", 
-c(colnames(fa_prod1$scores),"ln_typ_charge",
-"ln_disutility","like_1", "value_1"), FALSE, "ResponseId")
+c(colnames(fa_prod1$scores), "ln_typ_charge",
+"like_1", "value_1"), FALSE, "ResponseId")
 
 
 #######writing outputs
@@ -110,7 +110,7 @@ FA_onProd1_output <- bind_rows(
   r2_prod1fa
 )
 
-write.csv(FA_onProd1_output, "painofpayment/output/all_controls.csv", row.names = FALSE, na = "")
+write.csv(FA_onProd1_output, "painofpayment/output/not_disutility.csv", row.names = FALSE, na = "")
 #write.csv(FA_onProd1_output, "painofpayment/output/FAonProd1_output.csv", row.names = FALSE, na = "")
 
 
