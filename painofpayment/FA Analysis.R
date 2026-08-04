@@ -62,6 +62,16 @@ df_long_scored <- df_long %>%
 #corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
 # corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
 #corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
+df_long_scored <- df_long_scored %>%
+  mutate(item_focal = case_when(
+    Category == "prod_1" ~ Item,
+    Category == "prod_2" ~ Item2,
+    Category == "prod_3" ~ Item3
+  ))
+
+#monthsubset_df <- df_long_scored %>% filter(item_focal == "Monthly car payment")
+#cor.test(monthsubset_df$painful_1, monthsubset_df$f_worthless_alone)
+
 
 corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_charge",
 "ln_disutility","like_1","value_1"), df_long_scored, FALSE, "ResponseId")
@@ -85,6 +95,8 @@ corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_ch
 # reg_pooled_kmo <- reg_results(person_level_long_kmo,"painful_1", names(fa_j_highkmo), TRUE, "ResponseId")
 #reg_RE_all <- reg_results(df_long_all,"painful_1", names(fa_ij_all), FALSE, "ResponseId")
 # reg_RE_kmo <- reg_results(df_long_kmo,"painful_1", names(fa_ij_highkmo), FALSE, "ResponseId")
+
+
 
 ind_vars <- c(colnames(fa_prod1$scores), "value_1", "purchased", "ln_disutility")
 drop <- c( "f_overpriced") 
