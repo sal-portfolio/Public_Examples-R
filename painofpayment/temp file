@@ -1,7 +1,0 @@
-df_long_all[["painful_1"]] <- as.ordered(df_long_all[["painful_1"]])
-
-ordinal_formula <- as.formula(paste("painful_1", "~", paste(names(fa_ij_some), collapse = " + "), "+ (1 |", "ResponseId", ")"))
-ordinal_model <- clmm(ordinal_formula, data = df_long_all, control = clmm.control(maxIter = 1000, gradTol = 1e-6, maxLineIter = 100))
-    
-coef_table <- coef(summary(ordinal_model))
-
