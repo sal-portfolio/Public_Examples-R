@@ -3,34 +3,26 @@
 # Author: Amanda
 #####ETL Only####
 
-data_name <- "painofpayment/data/PoP+Factor+Analysis+7-29-26_August+14,+2026_20.05.csv"
+data_name <- "painofpayment/data/PoP+Factor+Analysis+10-16-25_July+9,+2026_17.33.csv"
 # Read raw header without deduplication, to preserve true positions
 # of repeated column names (prod_1_1 through prod_1_46 appear 3 times)
 raw_names <- read_csv(data_name, n_max = 0, name_repair = "minimal") %>% names()
 
 #  Load the data & take out two junk rows/descriptions
 df <- read_csv(data_name, name_repair = "minimal") 
-#### weird naming conventions from Aug 14 survey
-###which(names(df) == "prod_2_21")
-###which(names(df) == "prod_1_2")
-names(df)[23:23] <- gsub("_2", "_1", names(df)[23:23])
-names(df)[24:43] <- gsub("prod_2", "prod_1", names(df)[24:43])
-names(df)[53:53] <- gsub("prod_1_2", "prod_2_1", names(df)[53:53])
-names(df)[87:87] <- gsub("prod_1_2", "prod_3_1", names(df)[87:87])
-names(df)[88:107] <- gsub("prod_2", "prod_3", names(df)[88:107])
 
 # # Find the position of each occurrence of prod_1_x across the 3 blocks
-# prod_items <- c(1:21)
-# prod_pattern <- paste0("prod_1_", prod_items)
+prod_items <- c(1:9, 11:46)
+prod_pattern <- paste0("prod_1_", prod_items)
 
-# positions <- purrr::map(prod_pattern, ~ which(raw_names == .x))
+positions <- purrr::map(prod_pattern, ~ which(raw_names == .x))
 
-# block2_idx <- purrr::map_int(positions, 2)  # 2nd occurrence of each item
-# block3_idx <- purrr::map_int(positions, 3)  # 3rd occurrence of each item
+block2_idx <- purrr::map_int(positions, 2)  # 2nd occurrence of each item
+block3_idx <- purrr::map_int(positions, 3)  # 3rd occurrence of each item
 
 # # Rename block 2 and block 3 by position (block 1 stays as prod_1_x)
-# names(df)[block2_idx] <- paste0("prod_2_", prod_items)
-# names(df)[block3_idx] <- paste0("prod_3_", prod_items)
+names(df)[block2_idx] <- paste0("prod_2_", prod_items)
+names(df)[block3_idx] <- paste0("prod_3_", prod_items)
 
 # take away two description rows and convert type
 df <- df %>%

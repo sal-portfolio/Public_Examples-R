@@ -19,19 +19,6 @@ names(df)[53:53] <- gsub("prod_1_2", "prod_2_1", names(df)[53:53])
 names(df)[87:87] <- gsub("prod_1_2", "prod_3_1", names(df)[87:87])
 names(df)[88:107] <- gsub("prod_2", "prod_3", names(df)[88:107])
 
-# # Find the position of each occurrence of prod_1_x across the 3 blocks
-# prod_items <- c(1:21)
-# prod_pattern <- paste0("prod_1_", prod_items)
-
-# positions <- purrr::map(prod_pattern, ~ which(raw_names == .x))
-
-# block2_idx <- purrr::map_int(positions, 2)  # 2nd occurrence of each item
-# block3_idx <- purrr::map_int(positions, 3)  # 3rd occurrence of each item
-
-# # Rename block 2 and block 3 by position (block 1 stays as prod_1_x)
-# names(df)[block2_idx] <- paste0("prod_2_", prod_items)
-# names(df)[block3_idx] <- paste0("prod_3_", prod_items)
-
 # take away two description rows and convert type
 df <- df %>%
   dplyr::slice(-c(1, 2)) %>%
