@@ -10,78 +10,53 @@ library(ordinal)
 library(rmcorr)
 
 source("painofpayment/FA Functions.R")
-source("painofpayment/ETL First Factor Analysis.R")
+source("painofpayment/ETL 2nd factor analysis.R")
 
 ################################################################################
 #Factor analysis across product i and person j (multiple i per j)#
 ################################################################################
 
-
-items_ij <- df_long %>%
-  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
-  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -like_1, -value_1, -purchased, -Item, -Item2, 
-  -Item3, -Category )  
+ 
 items_prod1 <- df_long %>%
   dplyr::filter(Category == "prod_1") %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
-  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -like_1, -value_1, -purchased, -Item, -Item2,
-  -Item3, -Category)
-#running factor analysis w/ or w/out low kmo results
-# low_kmo_j <- KMO_results(items_j, 0.7)
-# low_kmo_ij <- KMO_results(items_ij, 0.7)
-# items_j_highkmo <- items_j[, !(names(items_j) %in% low_kmo_j)]
-# items_ij_highkmo <- items_ij[, !(names(items_ij) %in% low_kmo_ij)]
-
-
-# fa_j_all <- as.data.frame(factor_analysis(items_j)$scores)
-# # fa_j_highkmo <- as.data.frame(factor_analysis(items_j_highkmo)$scores)
-# fa_ij_all <- as.data.frame(factor_analysis(items_ij)$scores)
+  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -value_1, -purchased, -Item, -Item2,
+  -Item3, -Category, -item_focal)
 
 fa_prod1 <- factor_analysis(items_prod1)
-#applying the factor loadings to all of the items (not just product 1)
-scores_full <- psych::factor.scores(items_ij, fa_prod1)$scores
 
-# fa_ij_highkmo <- as.data.frame(factor_analysis(items_ij_highkmo)$scores)
+#applying the factor loadings to all of the items (not just product 1) using tenBerge method for weights
 
-#print(factor_analysis(items_ij)$model, cut = 0.5)  
 
-# person_level_long_kmo <- cbind(person_level_long, fa_j_highkmo)
-# df_long_kmo <- cbind(df_long, fa_ij_highkmo)
-# person_level_long_all <- cbind(person_level_long, fa_j_all)
-# df_long_all <- cbind(df_long, fa_ij_all)
+items_ij <- df_long %>%
+  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -value_1, -purchased, -Item, -Item2, 
+  -Item3, -Category, -item_focal)  
+items_i <- product_level_long %>%
+  dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
+  -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -value_1, -purchased, -item_focal)
+
+
+scores_ij <- psych::factor.scores(items_ij, fa_prod1)$scores
+scores_i <- psych::factor.scores(items_i, fa_prod1)$scores
+
+
 df_long_scored <- df_long %>%
-  dplyr::bind_cols(as.data.frame(scores_full))
+  dplyr::bind_cols(as.data.frame(scores_ij))
+
+product_level_long_scored <- product_level_long %>%
+  dplyr::bind_cols(as.data.frame(scores_i))
 
 
-#checking inter-factor correlations to avoid multicollinearity (+ check w/ PoP)
-
-# corr_j_highkmo <- corr_results(names(fa_j_highkmo), person_level_long_kmo, TRUE, "ResponseId")
-#corr_j_all <- corr_results(names(fa_j_all), person_level_long_all, TRUE, "ResponseId")
-# corr_ij_highkmo <- corr_results(names(fa_ij_highkmo), df_long_kmo, FALSE, "ResponseId")
-#corr_ij_all <- corr_results(names(fa_ij_all), df_long_all, FALSE, "ResponseId")
-df_long_scored <- df_long_scored %>%
-  mutate(item_focal = case_when(
-    Category == "prod_1" ~ Item,
-    Category == "prod_2" ~ Item2,
-    Category == "prod_3" ~ Item3
-  ))
 
 #monthsubset_df <- df_long_scored %>% filter(item_focal == "Monthly car payment")
 #cor.test(monthsubset_df$painful_1, monthsubset_df$f_worthless_alone)
 
 
+********Done through here
 corr_prod1fa <- corr_results(c("painful_1", colnames(fa_prod1$scores),"ln_typ_charge",
 "ln_disutility","like_1","value_1"), df_long_scored, FALSE, "ResponseId")
 
-
-# df_select <- df_long_scored %>%
-#   dplyr::select(dplyr::all_of(c("painful_1", colnames(fa_prod1$scores))))
-
-# cor_matrix <- cor(df_select, use = "pairwise.complete.obs")
-# round(cor_matrix, 2)
-# cor_df <- as.data.frame(cor_matrix) %>%
-#   tibble::rownames_to_column(var = "variable")
-# write.csv(cor_df, "correlation_matrix_prod1FA.csv", row.names = FALSE, na = "")
 
 
 ################################################################################

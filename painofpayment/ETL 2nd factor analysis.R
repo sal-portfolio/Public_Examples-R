@@ -30,13 +30,11 @@ df <- df %>%
     prod_2_painful_1 = Q587_1,
     prod_2_typ_charge = Q589,
     prod_2_fair_price = Q590,
-    prod_2_like_1 = Q591_1,
     prod_2_value_1 = Q592_1,
     prod_2_purchased = Q593,
     prod_3_painful_1 = Q597_1,
     prod_3_typ_charge = Q599,
     prod_3_fair_price = Q600,
-    prod_3_like_1 = Q601_1,
     prod_3_value_1 = Q602_1,
     prod_3_purchased = Q603
   )
@@ -75,83 +73,50 @@ glimpse(df_long)
 # renaming variables 
 df_long <- df_long %>%
   rename(
-    too_high = `1`,
-    overpriced = `2`,
-    ripoff = `3`,
-    expensive = `4`,
-    worth_price = `5`,
-    cheaper_not_different = `6`,
-    budget_strain = `7`,
-    needs_wealth = `8`,
-    extra_money_to_spare = `9`,
-    helps_other_things = `11`,
-    worthless_alone = `12`,
-    value_with_others = `13`,
-    wouldnt_buy_if_not_required = `14`,
-    should_come_included = `15`,
-    unnecessary = `16`,
-    have_choice = `17`,
-    have_other_options = `18`,
-    no_real_alternatives = `19`,
-    negative_consequences_if_not = `20`,
-    feel_powerless = `21`,
-    cant_control_timing = `22`,
-    purchase_regularly = `23`,
-    buy_similar_soon = `24`,
-    always_pretty_much_same = `25`,
-    recurring_bill = `26`,
-    very_aware_when_charged = `27`,
-    always_have_to_pay = `28`,
-    can_hold_touch = `29`,
-    physical_product = `30`,
-    can_physically_keep = `31`,
-    use_long_period = `32`,
-    lasts_a_while = `33`,
-    feels_like_investment = `34`,
-    businesses_give_away_free = `35`,
-    people_dont_pay_money = `36`,
-    expect_free = `37`,
-    should_be_free = `38`,
-    roughly_the_same_anywhere = `39`,
-    many_different_types = `40`,
-    unsure_long_term_benefit = `41`,
-    unsure_before_using = `42`,
-    learn_quality_after_purchase = `43`,
-    saves_time = `44`,
-    makes_life_easier = `45`,
-    makes_life_more_convenient = `46`
+    overpriced = `1`,
+    more_expect = `2`,
+    expensive = `3`,
+    worthless_alone = `4`,
+    use_withothers = `5`,
+    enable_other = `6`,
+    allows_something = `7`,
+    have_choice = `8`,
+    have_options = `9`,
+    cannot_control = `10`,
+    unavoidable_req = `11`,
+    noreal_choice = `12`,
+    hold_touch = `13`,
+    physical_product = `14`,
+    tangible_concrete = `15`,
+    long_period = `16`,
+    lasts_awhile = `17`,
+    giveaway_free = `18`,
+    usually_dontpay = `19`,
+    expect_free = `20`,
+    shouldbe_free = `21`
   )
 df_long <- df_long %>% mutate(ln_disutility =  ifelse(fair_price > typ_charge, log(1), log(typ_charge - fair_price + 1)))
 df_long <- df_long %>% mutate(ln_typ_charge = log(typ_charge)) 
 
-### result filtering 
-drop_items <- c(
-  "too_high", "ripoff",                    # 1–4
-  "worth_price", "cheaper_not_different",                             # 5–6
-   "budget_strain",  "needs_wealth",          # 7–9
-  "helps_other_things",  "extra_money_to_spare",                                              # 11
-  "wouldnt_buy_if_not_required", "unnecessary",                       # 14, 16
-  "feel_powerless",                                             # 22
-  "purchase_regularly", "buy_similar_soon",                           # 23–24
-  "always_pretty_much_same", "recurring_bill",                        # 25–26
-  "very_aware_when_charged", "always_have_to_pay",                    # 27–28
-  "can_physically_keep", "feels_like_investment",                           # 33–34
-  "roughly_the_same_anywhere", "many_different_types",                # 39–40
-  "unsure_long_term_benefit", "unsure_before_using",                  # 41–42
-  "learn_quality_after_purchase", "should_come_included",
-  "saves_time", "makes_life_easier",
-  "makes_life_more_convenient"
-)
+# ### result filtering 
+# drop_items <- c(
+#   "too_high", "ripoff"
+# )
+# df_long <- df_long %>%
+#   dplyr::select(-all_of(drop_items)
+#   )
+
+
+######## Pooling by product (product-level i analysis)##########
 df_long <- df_long %>%
-  dplyr::select(-all_of(drop_items)
-  )
-
-
-######## Pooling by product (person-level j analysis)##########
-#create person-level df
-person_level_long <- df_long %>%
+  mutate(item_focal = case_when(
+    Category == "prod_1" ~ Item,
+    Category == "prod_2" ~ Item2,
+    Category == "prod_3" ~ Item3
+  ))
+product_level_long <- df_long %>%
   dplyr::select(-Item, -Item2, -Item3, -Category) %>%
-  group_by(ResponseId) %>%
+  group_by(item_focal) %>%
   summarize(
     across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
     across(where(is.character), ~ first(.x)),
