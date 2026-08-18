@@ -76,4 +76,4 @@ reg_prodlevel <- reg_results(product_level_long_scored,"painful_1", partial_xvar
 #######write output
 
 dflong_output <- write_output(reg_dflong, corr_dflong, "painofpayment/output/Study_2_unpooled.csv", fa_object = fa_prod1)
-prodlevel_output <- write_output(reg_prodlong, corr_prodlevel, "painofpayment/output/Study_2_prodpooled.csv", fa_object = fa_prod1)
+prodlevel_output <- write_output(reg_prodlevel, corr_prodlevel, "painofpayment/output/Study_2_prodpooled.csv", fa_object = fa_prod1)
