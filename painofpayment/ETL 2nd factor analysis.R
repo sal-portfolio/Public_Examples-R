@@ -96,7 +96,7 @@ df_long <- df_long %>%
     shouldbe_free = `21`
   )
 df_long <- df_long %>% mutate(ln_disutility =  ifelse(fair_price > typ_charge, log(1), log(typ_charge - fair_price + 1)))
-df_long <- df_long %>% mutate(ln_typ_charge = log(typ_charge)) 
+df_long <- df_long %>% mutate(ln_typ_charge = log(typ_charge + 1)) 
 
 # ### result filtering 
 # drop_items <- c(
