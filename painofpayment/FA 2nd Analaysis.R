@@ -25,9 +25,8 @@ items_prod1 <- df_long %>%
 
 fa_prod1 <- factor_analysis(items_prod1)
 
+
 #applying the factor loadings to all of the items (not just product 1) using tenBerge method for weights
-
-
 items_ij <- df_long %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
   -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -value_1, -purchased, -Item, -Item2, 
@@ -35,8 +34,6 @@ items_ij <- df_long %>%
 items_i <- product_level_long %>%
   dplyr::select(-ResponseId, -age, -gender, -attention_check, -painful_1,
   -typ_charge, -fair_price, -ln_disutility, -ln_typ_charge, -value_1, -purchased, -item_focal)
-
-
 scores_ij <- psych::factor.scores(items_ij, fa_prod1)$scores
 scores_i <- psych::factor.scores(items_i, fa_prod1)$scores
 
